@@ -20,10 +20,8 @@ const table_types = (
 struct StructType
     adate::Date
     astring::Union{String, Nothing}
-    aumber::Union{Real, Nothing}
+    anumber::Union{Real, Nothing}
 end
-
-#structtable = [StructType(Date("2021-12-01"), "string 1", 123.45), StructType(Date("2021-12-02"), "string 2", 456.78)]
 
 @testset "CSV.write" begin
 
@@ -181,11 +179,23 @@ end
             NamedTuple(),
             "a\n1\n"
         ),
-        # jcunwin
+        # struct with header: issue 961
         (
             [StructType(Date("2021-12-01"), "string 1", 123.45), StructType(Date("2021-12-02"), "string 2", 456.78)],
             (header=["Date Column", "String Column", "Number Column"],),
             "Date Column,String Column,Number Column\n2021-12-01,string 1,123.45\n2021-12-02,string 2,456.78\n"
+        ),
+        # struct with missing values and with header: issue 961
+        (
+            [StructType(Date("2021-12-01"), nothing, 123.45), StructType(Date("2021-12-02"), "string 2", nothing)],
+            (transform=(col, val) -> something(val, missing), header=["Date Column", "String Column", "Number Column"],),
+            "Date Column,String Column,Number Column\n2021-12-01,,123.45\n2021-12-02,string 2,\n"
+        ),
+        # struct without header: issue 961
+        (
+            [StructType(Date("2021-12-01"), "string 1", 123.45), StructType(Date("2021-12-02"), "string 2", 456.78)],
+            NamedTuple(),
+            "adate,astring,anumber\n2021-12-01,string 1,123.45\n2021-12-02,string 2,456.78\n"
         )
     ]
 
