@@ -23,6 +23,10 @@ struct StructType
     anumber::Union{Real, Nothing}
 end
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ac6d567a34bf87eba0e99c79ea3a31cfb2057950
 @testset "CSV.write" begin
 
     testcases = [
